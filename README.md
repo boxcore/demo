@@ -40,7 +40,6 @@ BOXCORE-LAMP是在CentOS下自动安装apache、mysql和php的脚本，目前最
 
 - **lamp-bro.sh：** LAMPBRODER（兄弟连）lamp安装版
 - **lamp-stabe.sh：** Apache2.2 + MySQL5.5 + PHP5.3
-- 
 
 TODO
 -----------------
