@@ -68,6 +68,7 @@ function InitInstall()
 	#Disable SeLinux
 	if [ -s /etc/selinux/config ]; then
 	sed -i 's/SELINUX=enforcing/SELINUX=disabled/g' /etc/selinux/config
+	sed -i 's/SELINUXTYPE=targeted/#SELINUXTYPE=targeted/g' /etc/selinux/config
 	fi
 
 	cp /etc/yum.conf /etc/yum.conf.lamp
@@ -602,12 +603,26 @@ echo "/usr/local/memcache/bin/memcached -umemcache &" >> /etc/rc.d/rc.local
 
 }
 
+# install phpmyadmin
+function InstallPhpMyAdmin()
+{
+echo "============================ Install phpMyAdmin ================================="
+cd $cur_dir
+
+tar -zxf phpMyAdmin-3.0.0-rc1-all-languages.tar.gz
+cp -r phpMyAdmin-3.0.0-rc1-all-languages /usr/local/apache2/htdocs/phpmyadmin
+cp /usr/local/apache2/htdocs/phpmyadmin/config.sample.inc.php /usr/local/apache2/htdocs/phpmyadmin/config.inc.php
+sed -i "s/\$cfg\['Servers'\]\[\$i\]\['auth\_type'\] = 'cookie';/\$cfg\['Servers'\]\[\$i\]\['auth\_type'\] = 'http';/g" /usr/local/apache2/htdocs/phpmyadmin/config.inc.php
+
+}
+
 mkdir -pv logs
 InitInstall 2>&1 | tee -a logs/InitInstall-`date +%Y%m%d`.log
 CheckAndDownloadLibFiles 2>&1 | tee -a logs/CheckAndDownloadLibFiles-`date +%Y%m%d`.log
 InstallLib 2>&1 | tee -a logs/InstallLib-`date +%Y%m%d`.log
 InstallApache 2>&1 | tee -a logs/InstallApache-`date +%Y%m%d`.log
-InstallMYSQL 2>&1 | tee -a logs/InstallMYSQL-`data +%Y%m%d`.log
+InstallMYSQL 2>&1 | tee -a logs/InstallMYSQL-`date +%Y%m%d`.log
 InstallPHP 2>&1 | tee -a logs/InstallPHP-`date +%Y%m%d`.log
 InstallPHPExtension 2>&1 | tee logs/InstallPHPExtension-`date +%Y%m%d`.log
 InstallMemcache 2>&1 | tee logs/InstallMemcache-`date +%Y%m%d`.log
+InstallPhpMyAdmin 2>&1 | tee logs/InstallPhpMyAdmin-`date +%Y%m%d`.log
