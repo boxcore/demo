@@ -2,12 +2,10 @@ PHP NOTE 9 mysql 复习
 @20130611 by boxcore
 @20140429 再次编辑，修改结构
 
--- 约定：
--- tabname：表名
--- dbname:数据库名
--- fieldname 或 field+n : 字段名
--- oldTabName:旧表名
--- newTabName:新表名
+*歧义说明
+- 列和字段是一个意思，都是table下的一个column；
+
+
 
 --------------------
 一、数据库概述
@@ -56,18 +54,111 @@ PHP NOTE 9 mysql 复习
           use mysql
           delete from user where user=" 用户名";
 
------------------
-三、数据库的操作
------------------
-1.创建数据库     create database dbname ；
-2.查看数据库     show databases;
-3.删除数据库     drop database dbname ；
-4.切换数据库     use dbname ；
+
+		  
+三、数据库常用语法概述
+======================
+
+3.1 数据库操作
+--------------
+1. 创建数据库     create database dbname ；
+2. 查看数据库     show databases;
+3. 删除数据库     drop database dbname ；
+4. 切换数据库     use dbname ；
+
+3.2 表操作
+-----------
+1. 查看表：show tables ；
+2. 创建表：create table tabname (field1 ，field2， fieldn);
+3. 删除表：dorp table [if exists] tabname ；
+4. 修改表名：rename table oldTabName to newTabName ；
+5. 查询表结构：desc tabname；
 
 
------------------------------------
+3.3 表内容管理
+---------------
+1.增加数据：insert
+insert into user(name) values("user4");
+
+2.删除数据：delete
+//必须加where 条件，如果不加 where全部删除，这个时候应该用 truncate清空数据
+delete from user where id>=3 and id<=5;
+delete from user where id between 3 and 5;
+
+3.修改数据：update
+update user set name='user5',age=20 where id=5;
+//在mysql 中没有==，只有 =，即包含赋值，又包含比较
+
+4.查询数据：select
+
+
+
+3.4 数据字段类型
+-----------------------
+
+1) 数值(int|float|tinyint)     // 显示和大小
+     ·tinyint数值类型的无符号取值范围： 0-255
+     ·int数值类型的无符号取值范围： 0-42亿
+
+2) 字符串(char|varchar|enum|set) // 显示和个数
+     ·char(3)的意思是什么： 0-255
+     ·varchar(3)的意思是什么： 0-65535
+
+3) 日期和时间( date|time|datetime|year|timestamp )
+     在php中把时间加工成时间戳，放到 mysql中的int 列
+
+
+3.5 数据字段属性
+-----------------
+1.unsigned
+2.zerofill
+3.auto_increment
+4.null
+5.not null     # 如表中性别例子 ,如果有一列你设计成not null,那么给 default默认值
+6.default
+
+
+3.6 数据表的类型
+-----------------
+1.myisam     // 默认就是 myisam
+2.innodb     // 事务
+
+     创建表时指定表类型： create table t1(id int) engine=innodb;
+     修改表引擎类型： alter table tablename engine=innodb;
+     查看表类型： show create table tabname;
+
+
+3.7 数据表索引设置
+-------------------
+
+	1.主键索引 primary key 一个表中只能有一个主键索引
+
+	添加索引 :
+	1).建表时就加上去
+	2).用alter 命令
+		 alter table t2 add primary key(id);  // 加主键
+		 alter table t2 modify id int unsigned auto_increment; // 加无符号和自增属性
+
+	删除索引 :
+		 alter table t2 modify id int; --加无符号和自增属性
+		 alter table t2 drop primary key;
+
+	2. 唯一索引     unique index
+		 // 每一列都可以是唯一索引，本列值不能重复值
+
+	3. 普通索引     index
+
+		 添加索引 :alter table user add index in_name(name);
+		 删除索引 :alter table user drop index in_name;
+
+	//每一列都可以是普通索引
+
+	4.全文索引     fulltext
+
+
+
 结构化查询语言 sql包含四个部分:
------------------------------------
+
 1.DDL   // 数据定义语言 ,create,drop,alter
 2.DML   // 数据操作语言 ,insert,update,delete
 3.DQL   // 数据查询语言 ,select
@@ -75,10 +166,10 @@ PHP NOTE 9 mysql 复习
 
 
 ----------------------------
-数据定义语言 (DDL)
+五、数据定义语言 (DDL)
 ----------------------------
 
-一、 CREATE语句：
+I. CREATE语句：
 ----------------
 	CREATE TABLE `special` (
 		`id`  int(10) UNSIGNED NOT NULL AUTO_INCREMENT ,
@@ -93,11 +184,11 @@ PHP NOTE 9 mysql 复习
 	ROW_FORMAT=Compact
 	;
 
-二、 DROP语句
+II. DROP语句
 --------------
 
 
-三、 ALTER语句
+III. ALTER语句
 ------------------------------------
 alter修改数据表结构
 
@@ -151,9 +242,9 @@ alter table user auto_increment=1;
 	ALTER TABLE `mytab` MODIFY COLUMN `visitor`  char(32) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT '' COMMENT '用户识别码' AFTER `use_time`;
 
 	
-----------------------------
-操作数据表中的数据记录 (DML)
-----------------------------
+
+六、操作数据表中的数据记录 (DML)
+---------------------------------
 1.insert
 eg:insert into user(name) values("user4");
 
@@ -166,9 +257,9 @@ update user set name='user5',age=20 where id=5;
 //必须加where 条件，如果不加 where全部删除，这个时候应该用 truncate清空数据
 delete from user where id>=3 and id<=5; 等同于 delete from user where id between 3 and 5;
 
----------------------------------
-数据查询语言（ DQL）--select 使用
----------------------------------
+
+七、数据查询语言（ DQL）--select 使用
+-------------------------------------
 
 1.选择特定的字段
 select id,name from user;
@@ -267,7 +358,7 @@ Adams           2000
 --------------------------
 
 
----------------------------------------
+
 数据查询语言（ DQL）2--select 的多表查询
 ---------------------------------------
 假如下面三种方法都能实现一种表，优先选择普通多表查询。
@@ -296,120 +387,21 @@ select user.id,user.name,tel.num from user left join tel on user.id=tel.uid;
 
 
 
----------------------------------------
-DCL数据控制语言(grant,commit,rollback)
----------------------------------------
 
-一、GRANT权限控制
+八、DCL数据控制语言(grant,commit,rollback)
+-------------------------------------------
 
-二、COMMIT控制
+1. GRANT权限控制
 
-三、ROLLBACK控制
+2. COMMIT控制
+
+3. ROLLBACK控制
 
 
 
 
 ------------------------------------
 
------------
-四、表操作
------------
-1.查看表：show tables ；
-2.创建表：create table tabname (field1 ，field2， fieldn);
-3.删除表：dorp table [if exists] tabname ；
-4.修改表名：rename table oldTabName to newTabName ；
-5.查询表结构：desc tabname；
-
-
---------------------
-五、表内容管理
---------------------
-
-1.增加数据：insert
-insert into user(name) values("user4");
-
-2.删除数据：delete
-//必须加where 条件，如果不加 where全部删除，这个时候应该用 truncate清空数据
-delete from user where id>=3 and id<=5;
-delete from user where id between 3 and 5;
-
-3.修改数据：update
-update user set name='user5',age=20 where id=5;
-//在mysql 中没有==，只有 =，即包含赋值，又包含比较
-
-4.查询数据：select
-
-
-
------------------------
-六、数据字段类型
------------------------
-
-1.数值     // 显示和大小
-int|float|tinyint
-     ·tinyint数值类型的无符号取值范围： 0-255
-     ·int数值类型的无符号取值范围： 0-42亿
-
-2.字符串 // 显示和个数
-char|varchar|enum|set
-     ·char(3)的意思是什么： 0-255
-     ·varchar(3)的意思是什么： 0-65535
-
-3.日期和时间( 数值)
-date|time|datetime|year|timestamp
-     在php中把时间加工成时间戳，放到 mysql中的int 列
-
-
-
--------------------
-七、数据字段属性
--------------------
-1.unsigned
-2.zerofill
-3.auto_increment
-4.null
-5.not null     # 如表中性别例子 ,如果有一列你设计成not null,那么给 default默认值
-6.default
-
-
------------------
-八.数据表的类型
------------------
-1.myisam     // 默认就是 myisam
-2.innodb     // 事务
-
-     创建表时指定表类型： create table t1(id int) engine=innodb;
-     修改表引擎类型： alter table tablename engine=innodb;
-     查看表类型： show create table tabname;
-
-
--------------------
-九.数据表索引设置
--------------------
-
-1.主键索引 primary key 一个表中只能有一个主键索引
-
-添加索引 :
-1).建表时就加上去
-2).用alter 命令
-     alter table t2 add primary key(id);  // 加主键
-     alter table t2 modify id int unsigned auto_increment; // 加无符号和自增属性
-
-删除索引 :
-     alter table t2 modify id int; --加无符号和自增属性
-     alter table t2 drop primary key;
-
-2. 唯一索引     unique index
-     // 每一列都可以是唯一索引，本列值不能重复值
-
-3. 普通索引     index
-
-     添加索引 :alter table user add index in_name(name);
-     删除索引 :alter table user drop index in_name;
-
-//每一列都可以是普通索引
-
-4.全文索引     fulltext
 
 
 
@@ -417,8 +409,7 @@ date|time|datetime|year|timestamp
 
 
 
-
-==========================================
+=======================================================
 复习 --最常用的语法：
 -----------------------------------
 1.DDL 数据定义语言,create,drop,alter
