@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <script src="./jquery.js"></script>
+</head>
+<body>
+<div>hello</div>
+<span>oo</span>
+<p>hey</p>
+
+<script>
+/**
+ * 什么是dom？
+ */
+
+
+/**
+ * 把jquery对象转换为dom对象
+ *
+ */
+
+// 方法一
+$(function(){
+    var $div = $("div");
+    var div = $div[0];
+    console.log(div.innerHTML);
+    // alert(div.innerHTML);
+})
+// 方法二
+$(function(){
+    var $span = $("span");
+    var span = $span.get(0);
+    console.log(span.innerHTML);
+    // alert(div.innerHTML);
+})
+
+
+/**
+ * 把dom对象转为jq对象
+ * 
+ */
+$(function(){
+    var p = document.getElementsByTagName("p");
+    var $p = $(p[0]);
+    console.log($p.html());
+})
+</script>
+</body>
+</html>
